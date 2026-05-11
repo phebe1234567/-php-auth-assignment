@@ -5,32 +5,53 @@ $errors = [];
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
  
-    $username = $_POST['username'];
-    $email = $_POST['email'];
-    $password = $_POST['password'];
+       $username = trim($_POST['username']);
+    $email = trim($_POST['email']);
+    $password = trim($_POST['password']);
 
-    if (empty($username) || empty($email) || empty($password)) {
-        $errors[] = "All fields are required.";
+
+    if (empty($username)) {
+        $errors[] = "Username is required";
     }
-    if (strlen($username) < 4) {
-        $errors[] = "Username must be at least 4 characters.";
+
+    if (empty($email)) {
+        $errors[] = "Email is required";
     }
+
+    if (empty($password)) {
+        $errors[] = "Password is required";
+    }
+
+    if (strlen($username) < 3) {
+        $errors[] = "Username must be at least 3 characters";
+    }
+
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
+        $errors[] = "Invalid email format";
     }
+
+   
     if (strlen($password) < 8) {
-        $errors[] = "Password must be at least 8 characters.";
+        $errors[] = "Password must be at least 8 characters";
     }
 
-    if (empty($errors)) {
-        $stmt = $pdo->prepare("SELECT id FROM users WHERE username = ? OR email = ?");
-        $stmt->execute([$username, $email]);
-        if ($stmt->fetch()) {
-            $errors[] = "Username or Email already exists.";
-        }
+
+    $checkQuery = "SELECT * FROM users
+                   WHERE username = :username
+                   OR email = :email";
+
+    $stmt = $pdo->prepare($checkQuery);
+
+    $stmt->execute([
+        ':username' => $username,
+        ':email' => $email
+    ]);
+
+    if ($stmt->rowCount() > 0) {
+        $errors[] = "Username or email already exists";
     }
 
-    // 4. Hashing and Insertion
+
     if (empty($errors)) {
         $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
         
@@ -38,7 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         
         try {
             $insertStmt->execute([$username, $email, $hashedPassword]);
-            // Redirect on success
+            
             header("Location: login.php");
             exit;
         } catch (PDOException $e) {
