@@ -5,6 +5,8 @@ define('DB_NAME', 'php_auth_db');
 define('DB_USER', 'root'); 
 define('DB_PASS', '');     
 
+define('MIN_USERNAME_LENGTH', 3);
+define('MIN_PASSWORD_LENGTH', 6);
 
 try {
    
@@ -15,10 +17,10 @@ try {
     
    
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-             echo "Database connected successfully";
+             
     
 } catch (PDOException $e) {
    
-    die("Database connection failed: " . $e->getMessage());
+   die("Database connection failed. Please try again later.");
 }
 ?>
