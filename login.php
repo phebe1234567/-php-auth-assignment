@@ -38,6 +38,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>login</title>
 </head>
 <body>
+    <?php if (!empty($error)): ?>
+
+    <div class="error">
+        <p><?php echo $error; ?></p>
+    </div>
+
+   <?php endif; ?>
     <form action="login.php" method="POST">
 
     <label>Email</label><br>
